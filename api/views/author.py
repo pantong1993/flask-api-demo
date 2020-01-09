@@ -19,11 +19,22 @@ def author_ser(author):
     }
 
 
+author_field = {
+    "code": fields.String,
+    "msg": fields.String,
+    "data": fields.Nested({
+        "id": fields.Integer,
+        "name": fields.String
+    })
+}
+
+
 class AuthorView(Resource):
 
+    @marshal_with(fields=author_field)
     def get(self):
         authors = Author.query.all()
-        return {"code": 1000, "msg": "ok", "data": [author_ser(author) for author in authors]}
+        return {"code": 1000, "msg": "ok", "data": authors}
 
     def post(self):
         name = request.json.get("name")
@@ -35,10 +46,11 @@ class AuthorView(Resource):
 
 class AuthorOneView(Resource):
 
+    @marshal_with(fields=author_field)
     def get(self, id):
         print(id)
         author = Author.query.filter(Author.id == id).first()
-        return {"code": 1000, "msg": "ok", "data": author_ser(author)}
+        return {"code": 1000, "msg": "ok", "data": author}
 
     def put(self, id):
         name = request.json.get("name")
@@ -56,4 +68,3 @@ class AuthorOneView(Resource):
         except:
             db.session.rollback()
             return {"code": 1001, "msg": "删除失败"}
-

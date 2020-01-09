@@ -11,7 +11,6 @@ class BaseConfig(object):
     SQLALCHEMY_POOL_SIZE = 10  # 连接池
     SQLALCHEMY_MAX_OVERFLOW = 5
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    pass
 
 
 class ProConfig(BaseConfig):

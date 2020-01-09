@@ -24,11 +24,30 @@ def book_ser(book):
     }
 
 
+book_field = {
+    "code": fields.String,
+    "msg": fields.String,
+    "data": fields.Nested({
+        "id": fields.Integer,
+        "title": fields.String,
+        "publisher": fields.Nested({
+            "id": fields.Integer,
+            "name": fields.String
+        }),
+        "authors": fields.List(fields.Nested({
+            "id": fields.Integer,
+            "name": fields.String
+        }))
+    })
+}
+
+
 class BookView(Resource):
 
+    @marshal_with(fields=book_field)
     def get(self):
         books = Book.query.all()
-        return {"code": 1000, "msg": "ok", "data": [book_ser(book) for book in books]}
+        return {"code": 1000, "msg": "ok", "data": books}
 
     def post(self):
         title = request.json.get("title")
@@ -46,10 +65,11 @@ class BookView(Resource):
 
 class BookOneView(Resource):
 
+    @marshal_with(fields=book_field)
     def get(self, id):
         print(id)
         book = Book.query.filter(Book.id == id).first()
-        return {"code": 1000, "msg": "ok", "data": book_ser(book)}
+        return {"code": 1000, "msg": "ok", "data": book}
 
     def put(self, id):
         title = request.json.get("title")
@@ -70,10 +90,10 @@ class BookOneView(Resource):
         return {"code": 1000, "msg": "ok", "data": book_ser(book)}
 
     def delete(self, id):
-        # try:
+        try:
             Book.query.filter(Book.id == id).delete()
             db.session.commit()
             return {"code": 1000, "msg": "ok"}
-        # except:
-        #     db.session.rollback()
-        #     return {"code": 1001, "msg": "删除失败"}
+        except:
+            db.session.rollback()
+            return {"code": 1001, "msg": "删除失败"}

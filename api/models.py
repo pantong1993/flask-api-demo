@@ -14,6 +14,8 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(32), index=True, nullable=False)
     publisher_id = db.Column(db.Integer, db.ForeignKey("publisher.id", ondelete='CASCADE'))
+
+    # 仅用于查询,不会生成表格,返回api数据时,字段需要与该字段一致
     publisher = db.relationship("Publisher", backref="publisher_of_book", cascade='all, delete')
 
     authors = db.relationship("Author", secondary="booktoauthor", backref="books", cascade='all, delete',
